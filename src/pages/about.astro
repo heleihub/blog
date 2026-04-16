@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getSiteConfig } from '../lib/config';
+
+const siteConfig = await getSiteConfig();
+---
+
+<BaseLayout title="关于" description="关于 XiaoHe 博客">
+  <div class="max-w-3xl mx-auto">
+    <div class="bg-white rounded-lg shadow-sm p-8">
+      <h1 class="text-3xl font-bold mb-6">关于我</h1>
+      
+      <div class="prose prose-lg max-w-none">
+        <p class="text-gray-700 mb-4">
+          你好，我是 {siteConfig.site.author}，欢迎来到我的个人博客。
+        </p>
+        
+        <p class="text-gray-700 mb-4">
+          在这里，我会分享技术心得、生活感悟以及有趣的项目。希望能对你有所帮助。
+        </p>
+        
+        <h2 class="text-2xl font-semibold mt-8 mb-4">关于博客</h2>
+        
+        <p class="text-gray-700 mb-4">
+          本博客使用 Astro 框架构建，采用本地文件管理系统，无需数据库即可运行。
+        </p>
+        
+        <ul class="list-disc list-inside text-gray-700 mb-4 space-y-2">
+          <li>静态网站，访问速度快</li>
+          <li>Markdown 写作，简洁高效</li>
+          <li>支持代码高亮、图片、视频等丰富内容</li>
+        </ul>
+        
+        <h2 class="text-2xl font-semibold mt-8 mb-4">联系方式</h2>
+        
+        <p class="text-gray-700 mb-4">
+          你可以通过以下方式联系我：
+        </p>
+        
+        <ul class="list-disc list-inside text-gray-700 space-y-2">
+          <li>邮箱: hello@xiaohe.blog</li>
+          <li>GitHub: <a href={siteConfig.social.github} target="_blank" class="text-indigo-600 hover:underline">@xiaohe</a></li>
+          <li>Twitter: <a href={siteConfig.social.twitter} target="_blank" class="text-indigo-600 hover:underline">@xiaohe</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</BaseLayout>

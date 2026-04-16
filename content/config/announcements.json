@@ -1,0 +1,10 @@
+{
+  "announcements": [
+    {
+      "id": "1",
+      "content": "欢迎来到 XiaoHe 博客！这里分享技术与生活的点滴。",
+      "publishedAt": "2026-04-01T00:00:00Z",
+      "active": false
+    }
+  ]
+}

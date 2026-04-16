@@ -1,0 +1,88 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import { getTags, getCategories } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const tags = await getTags();
+  const allPosts = await getCollection('posts');
+  
+  return tags.map((tag: any) => {
+    const tagSlug = tag.slug || tag.id;
+    const tagPosts = allPosts.filter(post => 
+      post.data.tags && post.data.tags.some((t: string) => t === tagSlug || t === tag.id || t === tag.name)
+    );
+    return {
+      params: { slug: tagSlug },
+      props: { tag, posts: tagPosts },
+    };
+  });
+}
+
+const { tag, posts } = Astro.props;
+
+const categoryDefinitions = await getCategories();
+const categoryNameMap = new Map<string, string>();
+categoryDefinitions.forEach((cat: any) => {
+  categoryNameMap.set(cat.slug || cat.id, cat.name);
+});
+---
+
+<BaseLayout title={`标签: ${tag?.name || Astro.params.slug}`} description={`标签为 ${tag?.name} 的文章`}>
+  <div class="flex flex-col lg:flex-row gap-8">
+    <div class="flex-1 min-w-0">
+      <div class="space-y-6">
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <h1 class="text-3xl font-bold mb-2">标签: #{tag?.name}</h1>
+        </div>
+
+        <div class="space-y-6">
+          {posts.length === 0 ? (
+            <div class="text-center py-16 bg-white rounded-xl shadow-sm">
+              <p class="text-gray-500">该标签下暂无文章</p>
+            </div>
+          ) : (
+            posts.map(post => (
+              <article class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center text-sm text-gray-500 mb-3">
+                  <time dateTime={post.data.date}>{post.data.date}</time>
+                  <span class="mx-2">•</span>
+                  <span>{post.data.author}</span>
+                  {post.data.category && (
+                    <>
+                      <span class="mx-2">•</span>
+                      <a href={`/categories/${post.data.category}`} class="text-indigo-600 hover:text-indigo-800">
+                        {categoryNameMap.get(post.data.category) || post.data.category}
+                      </a>
+                    </>
+                  )}
+                </div>
+                
+                <h2 class="text-2xl font-bold mb-3">
+                  <a href={`/posts/${post.slug}`} class="text-gray-900 hover:text-indigo-600 transition-colors">
+                    {post.data.title}
+                  </a>
+                </h2>
+                
+                <p class="text-gray-600 mb-4">{post.data.excerpt}</p>
+                
+                <div class="flex flex-wrap gap-2">
+                  {post.data.tags.map((t: string) => (
+                    <a href={`/tags/${t}`} class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors">
+                      #{t}
+                    </a>
+                  ))}
+                </div>
+              </article>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+
+    <aside class="lg:w-72 flex-shrink-0">
+      <Sidebar />
+    </aside>
+  </div>
+</BaseLayout>

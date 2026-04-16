@@ -1,0 +1,426 @@
+---
+import '../../styles/global.css';
+---
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>管理面板 - XiaoHe 博客</title>
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+  <style>
+    .sidebar-item.active{background:rgba(59,130,246,0.1);color:#2563eb;border-right:3px solid #2563eb}
+    .tab-btn.active{color:#2563eb;border-bottom:2px solid #2563eb;background:#fff}
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Top Bar -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <div class="flex items-center justify-between px-4 lg:px-6 h-14">
+      <div class="flex items-center gap-4">
+        <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <a href="/admin/dashboard" class="flex items-center gap-2 text-gray-900 font-bold text-lg hover:text-blue-600 transition-colors">
+          <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+          XiaoHe Blog
+        </a>
+        <a href="/" target="_blank" class="hidden sm:flex items-center gap-1.5 text-sm text-gray-500 hover:text-blue-600 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          查看站点
+        </a>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-gray-500">你好，<strong class="text-gray-800" id="bar-nick">XiaoHe</strong></span>
+        <button onclick="logout()" class="text-sm text-gray-500 hover:text-red-500 transition-colors">退出</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed lg:sticky top-14 left-0 bottom-0 w-60 bg-white border-r border-gray-200 overflow-y-auto z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-200">
+      <nav class="py-4">
+        <div class="px-4 mb-2">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">概览</p>
+        </div>
+        <a class="sidebar-item active flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors" data-s="dashboard" onclick="nav('dashboard')">
+          <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          仪表盘
+        </a>
+
+        <div class="px-4 mt-4 mb-2">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">内容管理</p>
+        </div>
+        <a class="sidebar-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors" data-s="posts" onclick="nav('posts')">
+          <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+          文章
+          <span class="ml-auto bg-blue-100 text-blue-700 text-xs font-medium px-2 py-0.5 rounded-full" id="posts-bd">0</span>
+        </a>
+        <a class="sidebar-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors" data-s="categories" onclick="nav('categories')">
+          <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+          分类
+        </a>
+        <a class="sidebar-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors" data-s="tags" onclick="nav('tags')">
+          <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+          标签
+        </a>
+        <a class="sidebar-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors" data-s="comments" onclick="nav('comments')">
+          <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          评论
+        </a>
+        <a class="sidebar-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors" data-s="announcements" onclick="nav('announcements')">
+          <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+          公告
+        </a>
+
+        <div class="px-4 mt-4 mb-2">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">设置</p>
+        </div>
+        <a class="sidebar-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors" data-s="profile" onclick="nav('profile')">
+          <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+          个人中心
+        </a>
+        <a class="sidebar-item flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors" data-s="gh" onclick="nav('gh')">
+          <svg class="w-5 h-5 text-gray-700" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+          GitHub 设置
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Sidebar overlay for mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/30 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 min-w-0 p-4 lg:p-8">
+      <div id="ntc" class="hidden mb-4 p-3 bg-green-50 border-l-4 border-green-500 text-green-700 text-sm rounded-lg"></div>
+
+      <!-- Dashboard -->
+      <div id="sec-dashboard" class="sec block">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">仪表盘</h1>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-xl shadow-sm p-5 text-center">
+            <div class="text-3xl font-bold text-blue-600" id="s-p">0</div>
+            <div class="text-sm text-gray-500 mt-1">文章数</div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-5 text-center">
+            <div class="text-3xl font-bold text-green-600" id="s-pub">0</div>
+            <div class="text-sm text-gray-500 mt-1">已发布</div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-5 text-center">
+            <div class="text-3xl font-bold text-amber-500" id="s-d">0</div>
+            <div class="text-sm text-gray-500 mt-1">草稿</div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-5 text-center">
+            <div class="text-3xl font-bold text-red-500" id="s-c">0</div>
+            <div class="text-sm text-gray-500 mt-1">评论</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-white rounded-xl shadow-sm">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+              <h2 class="font-semibold text-gray-900">最近文章</h2>
+              <button onclick="nav('posts')" class="text-sm text-blue-600 hover:text-blue-700">查看全部 →</button>
+            </div>
+            <div class="p-4" id="dash-posts">
+              <p class="text-gray-400 text-center py-8">加载中...</p>
+            </div>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-100">
+              <h2 class="font-semibold text-gray-900">最近评论</h2>
+            </div>
+            <div class="p-4" id="dash-comments">
+              <p class="text-gray-400 text-center py-8">暂无评论</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm mt-6">
+          <div class="px-6 py-4 border-b border-gray-100">
+            <h2 class="font-semibold text-gray-900">快捷操作</h2>
+          </div>
+          <div class="p-4 flex flex-wrap gap-3">
+            <button onclick="nav('posts');pTab('new')" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">写文章</button>
+            <button onclick="nav('categories')" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">管理分类</button>
+            <button onclick="nav('tags')" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">管理标签</button>
+            <button onclick="nav('announcements')" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">发布公告</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Posts -->
+      <div id="sec-posts" class="sec hidden">
+        <div class="flex items-center justify-between mb-6">
+          <h1 class="text-2xl font-bold text-gray-900">文章</h1>
+          <button onclick="pTab('new')" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">写文章</button>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm mb-6">
+          <div class="flex border-b border-gray-100">
+            <button class="tab-btn active px-5 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent transition-colors" data-t="published" onclick="pTab('published')">已发布 (<span id="pub-n">0</span>)</button>
+            <button class="tab-btn px-5 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent transition-colors" data-t="drafts" onclick="pTab('drafts')">草稿 (<span id="dra-n">0</span>)</button>
+            <button class="tab-btn px-5 py-3 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent transition-colors" data-t="new" onclick="pTab('new')">写文章</button>
+          </div>
+        </div>
+        <div id="tab-published" class="ptc">
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <table class="w-full">
+              <thead><tr class="bg-gray-50 border-b border-gray-100"><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">标题</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">分类</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">标签</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">日期</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">操作</th></tr></thead>
+              <tbody id="pub-list" class="divide-y divide-gray-50"><tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">加载中...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="tab-drafts" class="ptc hidden">
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <table class="w-full">
+              <thead><tr class="bg-gray-50 border-b border-gray-100"><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">标题</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">分类</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">日期</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">操作</th></tr></thead>
+              <tbody id="dra-list" class="divide-y divide-gray-50"><tr><td colspan="4" class="px-6 py-8 text-center text-gray-400">暂无草稿</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="tab-new" class="ptc hidden">
+          <div class="bg-white rounded-xl shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-100">
+              <h2 class="font-semibold text-gray-900" id="ed-title">写文章</h2>
+            </div>
+            <div class="p-6">
+              <input type="hidden" id="ed-slug" value="">
+              <input type="hidden" id="ed-sha" value="">
+              <div class="mb-5">
+                <input type="text" id="p-title" class="w-full px-4 py-3 text-xl font-semibold border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="在此输入标题...">
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">分类</label>
+                  <select id="p-cat" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"></select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">标签（逗号分隔）</label>
+                  <input type="text" id="p-tags" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="astro, 教程">
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1.5">封面图片URL</label>
+                  <input type="text" id="p-cover" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="https://...">
+                </div>
+              </div>
+              <div class="mb-5">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">摘要</label>
+                <textarea id="p-excerpt" rows="2" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" placeholder="输入文章摘要..."></textarea>
+              </div>
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">文章内容</label>
+                <div id="post-editor"></div>
+              </div>
+              <div class="border-2 border-dashed border-amber-300 rounded-xl p-3 mb-4 bg-amber-50 text-center">
+                <span class="text-amber-700 text-sm font-medium">▼ 以下为隐藏内容（回复可见）▼</span>
+              </div>
+              <div class="mb-5">
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">隐藏内容（用户评论后可见）</label>
+                <div id="hidden-editor"></div>
+              </div>
+              <div class="flex gap-3">
+                <button onclick="pubPost(true)" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">发布文章</button>
+                <button onclick="pubPost(false)" class="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">保存草稿</button>
+                <button onclick="pTab('published')" class="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">取消</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Categories -->
+      <div id="sec-categories" class="sec hidden">
+        <div class="flex items-center justify-between mb-6">
+          <h1 class="text-2xl font-bold text-gray-900">分类</h1>
+          <button onclick="document.getElementById('add-cat').classList.toggle('hidden')" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">添加分类</button>
+        </div>
+        <div id="add-cat" class="hidden bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h2 class="font-semibold text-gray-900 mb-4">添加新分类</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">分类ID（英文）</label>
+              <input type="text" id="nc-id" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="tech">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">分类名称</label>
+              <input type="text" id="nc-name" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="技术">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">描述</label>
+              <input type="text" id="nc-desc" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="技术相关文章">
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="addCat()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">添加</button>
+            <button onclick="document.getElementById('add-cat').classList.add('hidden')" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">取消</button>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <table class="w-full">
+            <thead><tr class="bg-gray-50 border-b border-gray-100"><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">名称</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">描述</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">操作</th></tr></thead>
+            <tbody id="cat-list" class="divide-y divide-gray-50"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div id="sec-tags" class="sec hidden">
+        <div class="flex items-center justify-between mb-6">
+          <h1 class="text-2xl font-bold text-gray-900">标签</h1>
+          <button onclick="document.getElementById('add-tag').classList.toggle('hidden')" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">添加标签</button>
+        </div>
+        <div id="add-tag" class="hidden bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h2 class="font-semibold text-gray-900 mb-4">添加新标签</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">标签ID</label>
+              <input type="text" id="nt-id" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="astro">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">标签名称</label>
+              <input type="text" id="nt-name" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Astro框架">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Slug</label>
+              <input type="text" id="nt-slug" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="astro">
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="addTag()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">添加</button>
+            <button onclick="document.getElementById('add-tag').classList.add('hidden')" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">取消</button>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div id="tag-list" class="flex flex-wrap gap-2"></div>
+        </div>
+      </div>
+
+      <!-- Comments -->
+      <div id="sec-comments" class="sec hidden">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">评论</h1>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <table class="w-full">
+            <thead><tr class="bg-gray-50 border-b border-gray-100"><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">作者</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">内容</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">文章</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">日期</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">操作</th></tr></thead>
+            <tbody id="cmt-list" class="divide-y divide-gray-50"><tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">暂无评论</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Announcements -->
+      <div id="sec-announcements" class="sec hidden">
+        <div class="flex items-center justify-between mb-6">
+          <h1 class="text-2xl font-bold text-gray-900">公告</h1>
+          <button onclick="document.getElementById('add-ann').classList.toggle('hidden')" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">发布公告</button>
+        </div>
+        <div id="add-ann" class="hidden bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h2 class="font-semibold text-gray-900 mb-4">发布新公告</h2>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">公告内容</label>
+            <textarea id="na-content" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" placeholder="输入公告内容..."></textarea>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="addAnn()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">发布</button>
+            <button onclick="document.getElementById('add-ann').classList.add('hidden')" class="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">取消</button>
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+          <table class="w-full">
+            <thead><tr class="bg-gray-50 border-b border-gray-100"><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">内容</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">状态</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">日期</th><th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">操作</th></tr></thead>
+            <tbody id="ann-list" class="divide-y divide-gray-50"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Profile -->
+      <div id="sec-profile" class="sec hidden">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">个人中心</h1>
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h2 class="font-semibold text-gray-900 mb-5">个人资料</h2>
+          <div class="flex items-center gap-5 mb-6">
+            <img id="pv-avatar" src="https://tu.hexiaoyiok.dpdns.org/1776234509553_9e0u4c_avatar.png" class="w-16 h-16 rounded-full object-cover ring-4 ring-blue-50">
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">头像URL</label>
+              <input type="text" id="pf-avatar" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="https://tu.hexiaoyiok.dpdns.org/1776234509553_9e0u4c_avatar.png">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">昵称</label>
+              <input type="text" id="pf-nick" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="XiaoHe">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">个人简介</label>
+              <input type="text" id="pf-bio" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="热爱生活，热爱分享">
+            </div>
+          </div>
+          <button onclick="saveProfile()" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">保存修改</button>
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <h2 class="font-semibold text-gray-900 mb-5">修改密码</h2>
+          <div class="space-y-4 mb-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">当前密码</label>
+              <input type="password" id="pf-cpw" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">新密码</label>
+              <input type="password" id="pf-npw" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">确认新密码</label>
+              <input type="password" id="pf-cpw2" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+          </div>
+          <button onclick="changePw()" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">修改密码</button>
+        </div>
+      </div>
+
+      <!-- GitHub Settings -->
+      <div id="sec-gh" class="sec hidden">
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">GitHub 设置</h1>
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-sm text-blue-700">
+          配置 GitHub 仓库信息后，后台可直接操作仓库中的 Markdown/JSON 文件。发布文章后会自动触发 Cloudflare Pages 重新构建。
+        </div>
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <h2 class="font-semibold text-gray-900 mb-5">仓库配置</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">GitHub 用户名</label>
+              <input type="text" id="gh-owner" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="your-username">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">仓库名称</label>
+              <input type="text" id="gh-repo" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="your-blog-repo">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">分支</label>
+              <input type="text" id="gh-branch" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="main">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Personal Access Token</label>
+              <input type="password" id="gh-token" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="ghp_xxxxxxxxxxxx">
+            </div>
+          </div>
+          <div class="mb-5">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">文章目录路径</label>
+            <input type="text" id="gh-path" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="src/content/posts">
+          </div>
+          <div class="flex gap-3">
+            <button onclick="saveGh()" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">保存设置</button>
+            <button onclick="testGh()" class="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors">测试连接</button>
+          </div>
+          <div id="gh-result" class="hidden mt-4 text-sm"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script is:inline src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+  <script is:inline src="https://unpkg.com/turndown@7.1.3/dist/turndown.js"></script>
+  <script is:inline src="https://unpkg.com/marked@12.0.0/marked.min.js"></script>
+  <script is:inline src="/admin/app.js"></script>
+</body>
+</html>

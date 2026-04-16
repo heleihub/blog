@@ -1,0 +1,28 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getTags } from '../../lib/content';
+
+const tags = await getTags();
+---
+
+<BaseLayout title="所有标签" description="浏览所有标签">
+  <div class="space-y-6">
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <h1 class="text-3xl font-bold mb-2">标签</h1>
+      <p class="text-gray-600">浏览所有标签</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm p-6">
+      <div class="flex flex-wrap gap-3">
+        {tags.map((tag: any) => (
+          <a 
+            href={`/tags/${tag.slug}`}
+            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-indigo-100 hover:text-indigo-700 transition-colors"
+          >
+            #{tag.name}
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>

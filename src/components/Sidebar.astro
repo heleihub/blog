@@ -1,0 +1,239 @@
+---
+import { getCollection } from 'astro:content';
+import { getCategories, getAllComments } from '../lib/content';
+import { getStats } from '../lib/config';
+
+const allPosts = await getCollection('posts');
+const stats = await getStats();
+
+// 从 categories.json 获取中文名称映射
+const categoryDefinitions = await getCategories();
+const categoryNameMap = new Map<string, string>();
+categoryDefinitions.forEach((cat: any) => {
+  categoryNameMap.set(cat.slug || cat.id, cat.name);
+});
+
+const categoryIds = [...new Set(allPosts.map(p => p.data.category).filter(Boolean))];
+const categories = categoryIds.map(id => ({ id, name: categoryNameMap.get(id) || id, slug: id }));
+
+const avatarUrl = 'https://tu.hexiaoyiok.dpdns.org/1776234509553_9e0u4c_avatar.png';
+
+// 获取最新评论
+const allCommentsList = await getAllComments();
+const recentComments = allCommentsList.slice(0, 5);
+const commentCount = allCommentsList.length;
+
+// 随机头像颜色
+const avatarColors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-yellow-500', 'bg-red-500', 'bg-teal-500'];
+
+// Build archive data from posts
+const archiveMap = new Map<string, number>();
+allPosts.forEach(post => {
+  const yearMonth = post.data.date.substring(0, 7);
+  archiveMap.set(yearMonth, (archiveMap.get(yearMonth) || 0) + 1);
+});
+const archiveList = Array.from(archiveMap.entries())
+  .sort((a, b) => b[0].localeCompare(a[0]))
+  .slice(0, 6);
+---
+
+<div class="space-y-6">
+  <!-- 个人资料 -->
+  <div class="bg-white rounded-xl shadow-sm p-6">
+    <div class="flex flex-col items-center text-center">
+      <img src={avatarUrl} alt="头像" class="w-20 h-20 rounded-full mb-4 ring-4 ring-indigo-100" />
+      <h3 class="font-bold text-gray-900 text-lg mb-1">XiaoHe</h3>
+      <p class="text-sm text-gray-500 mb-2">热爱生活，热爱分享</p>
+      <p class="text-xs text-indigo-600 font-medium mb-4 tracking-wide">代码改变世界 · 分享创造价值</p>
+      <div class="flex items-center gap-4">
+        <a href="https://twitter.com/xiaohe" target="_blank" class="text-gray-400 hover:text-indigo-600 transition-colors" title="X">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a href="https://t.me/xiaohe" target="_blank" class="text-gray-400 hover:text-indigo-600 transition-colors" title="Telegram">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.654-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/></svg>
+        </a>
+        <a href="https://github.com/xiaohe" target="_blank" class="text-gray-400 hover:text-indigo-600 transition-colors" title="GitHub">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/></svg>
+        </a>
+        <a href="https://youtube.com/@xiaohe" target="_blank" class="text-gray-400 hover:text-indigo-600 transition-colors" title="YouTube">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 最新评论 -->
+  <div class="bg-white rounded-xl shadow-sm p-6">
+    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+      <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+      </svg>
+      最新评论
+    </h3>
+    {recentComments.length > 0 ? (
+      <div class="space-y-3">
+        {recentComments.map((comment: any, index: number) => {
+          const colorIndex = comment.author ? comment.author.charCodeAt(0) % avatarColors.length : index % avatarColors.length;
+          const initial = comment.author ? comment.author.charAt(0).toUpperCase() : '匿';
+          return (
+            <div class="relative bg-gray-50 rounded-lg p-3 ml-2 before:content-[''] before:absolute before:left-[-8px] before:top-3 before:border-4 before:border-transparent before:border-r-gray-50">
+              <div class="flex items-start gap-2">
+                <div class={`w-7 h-7 rounded-full ${avatarColors[colorIndex]} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}>
+                  {initial}
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-sm font-medium text-gray-800">{comment.author || '匿名'}</span>
+                    <span class="text-xs text-gray-400">{comment.createdAt ? comment.createdAt.substring(5, 10) : ''}</span>
+                  </div>
+                  <p class="text-sm text-gray-600 line-clamp-2 break-all">{comment.content}</p>
+                  {comment.postSlug && (
+                    <a href={`/posts/${comment.postSlug}`} class="text-xs text-indigo-500 hover:text-indigo-700 mt-1 inline-block">查看文章 →</a>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    ) : (
+      <p class="text-sm text-gray-400 text-center py-4">暂无评论</p>
+    )}
+  </div>
+
+  <!-- 分类 -->
+  {categories.length > 0 && (
+    <div class="bg-white rounded-xl shadow-sm p-6">
+      <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+        </svg>
+        分类
+      </h3>
+      <div class="flex flex-wrap gap-2">
+        {categories.map(category => (
+          <a href={`/categories/${category.slug}`} class="px-3 py-1.5 bg-indigo-50 text-indigo-700 rounded-full text-sm hover:bg-indigo-100 transition-colors">
+            {category.name}
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <!-- 标签云 -->
+  {allPosts.length > 0 && (
+    <div class="bg-white rounded-xl shadow-sm p-6">
+      <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+        </svg>
+        标签云
+      </h3>
+      <div class="flex flex-wrap gap-2">
+        {[...new Set(allPosts.flatMap(p => p.data.tags).filter(Boolean))].slice(0, 20).map(tag => (
+          <a href={`/tags/${tag}`} class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs hover:bg-gray-200 transition-colors">
+            #{tag}
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <!-- 归档 -->
+  {archiveList.length > 0 && (
+    <div class="bg-white rounded-xl shadow-sm p-6">
+      <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+        归档
+      </h3>
+      <div class="space-y-2">
+        {archiveList.map(([yearMonth, count]) => (
+          <a href={`/posts?date=${yearMonth}`} class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0 hover:text-indigo-600 transition-colors">
+            <span class="text-gray-700">{yearMonth}</span>
+            <span class="text-sm text-gray-500">({count})</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+
+  <!-- 网站统计 -->
+  <div class="bg-white rounded-xl shadow-sm p-6">
+    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+      <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+      </svg>
+      网站统计
+    </h3>
+    <div class="grid grid-cols-2 gap-3">
+      <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-3 text-center">
+        <div class="text-2xl font-bold text-indigo-600" id="total-visits" data-baseline={String(stats.totalVisits || 0)}>0</div>
+        <div class="text-xs text-indigo-500 mt-1">总访问量</div>
+      </div>
+      <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-3 text-center">
+        <div class="text-2xl font-bold text-green-600" id="today-visits">0</div>
+        <div class="text-xs text-green-500 mt-1">今日访问</div>
+      </div>
+      <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 text-center">
+        <div class="text-2xl font-bold text-purple-600">{allPosts.length}</div>
+        <div class="text-xs text-purple-500 mt-1">文章数</div>
+      </div>
+      <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-3 text-center">
+        <div class="text-2xl font-bold text-orange-600">{commentCount}</div>
+        <div class="text-xs text-orange-500 mt-1">评论数</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+(function() {
+  var TOTAL_KEY = 'xiaohe_blog_total_visits';
+  var TODAY_KEY = 'xiaohe_blog_today_visits';
+  var TODAY_DATE_KEY = 'xiaohe_blog_today_date';
+  var today = new Date().toDateString();
+
+  var baselineEl = document.getElementById('total-visits');
+  var baseline = baselineEl ? parseInt(baselineEl.getAttribute('data-baseline') || '0') : 0;
+
+  var totalVisits = parseInt(localStorage.getItem(TOTAL_KEY) || '0');
+  var todayVisits = parseInt(localStorage.getItem(TODAY_KEY) || '0');
+  var savedDate = localStorage.getItem(TODAY_DATE_KEY);
+
+  if (savedDate !== today) {
+    todayVisits = 0;
+    localStorage.setItem(TODAY_DATE_KEY, today);
+  }
+
+  var displayTotal = baseline + totalVisits;
+  var totalEl = document.getElementById('total-visits');
+  var todayEl = document.getElementById('today-visits');
+  if (totalEl) totalEl.textContent = displayTotal.toString();
+  if (todayEl) todayEl.textContent = todayVisits.toString();
+
+  fetch('https://api.ipify.org?format=json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var ip = data.ip || '';
+      if (!ip) return;
+      return crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip))
+        .then(function(buf) {
+          var arr = Array.from(new Uint8Array(buf));
+          var hash = arr.map(function(b) { return b.toString(16).padStart(2, '0'); }).join('').substring(0, 16);
+          var dedupKey = 'xiaohe_uv_' + hash + '_' + today;
+          if (!localStorage.getItem(dedupKey)) {
+            localStorage.setItem(dedupKey, '1');
+            totalVisits += 1;
+            todayVisits += 1;
+            localStorage.setItem(TOTAL_KEY, totalVisits.toString());
+            localStorage.setItem(TODAY_KEY, todayVisits.toString());
+            if (totalEl) totalEl.textContent = (baseline + totalVisits).toString();
+            if (todayEl) todayEl.textContent = todayVisits.toString();
+          }
+        });
+    })
+    .catch(function() {});
+})();
+</script>

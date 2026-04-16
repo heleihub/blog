@@ -1,0 +1,279 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
+import { getCollection } from 'astro:content';
+import { getAnnouncements } from '../lib/content';
+import { getViews } from '../lib/config';
+
+const allPosts = await getCollection('posts');
+const announcements = await getAnnouncements();
+const viewsData = await getViews();
+
+const sortedPosts = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+
+const carouselPosts = sortedPosts.filter(post => post.data.coverImage).slice(0, 3);
+const featuredPost = sortedPosts.slice(0, 1)[0]; // 只保留一篇特别推荐
+const latestPosts = sortedPosts.slice(0, 6);
+const activeAnnouncements = announcements.filter(a => a.active);
+---
+
+<BaseLayout title="XiaoHe Blog - 首页" hideAnnouncement={true}>
+  <div class="flex flex-col lg:flex-row gap-8">
+    <!-- Main Content (Left Column) -->
+    <div class="flex-1 space-y-6">
+      <!-- Top Row: Carousel + (Announcement + Featured) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Carousel (Left, 2/3 width) -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div id="carousel" class="relative h-[360px] bg-gray-100">
+              {carouselPosts.length > 0 ? (
+                <>
+                  <div class="carousel-slides absolute inset-0">
+                    {carouselPosts.map((post, index) => (
+                      <a 
+                        href={`/posts/${post.slug}`}
+                        class="carousel-slide absolute inset-0 transition-opacity duration-500"
+                        data-index={index}
+                        style={`opacity: ${index === 0 ? 1 : 0}; z-index: ${index === 0 ? 1 : 0}`}
+                      >
+                        <img 
+                          src={post.data.coverImage} 
+                          alt={post.data.title}
+                          class="w-full h-full object-cover"
+                        />
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6">
+                          <div class="backdrop-blur-md bg-black/30 rounded-xl p-4 border border-white/10">
+                            <h3 class="text-2xl font-bold text-white mb-2 drop-shadow-lg">{post.data.title}</h3>
+                            <p class="text-gray-200 text-sm line-clamp-2 drop-shadow">{post.data.excerpt}</p>
+                          </div>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                  
+                  <!-- Carousel Indicators -->
+                  <div class="absolute bottom-4 right-4 flex gap-2">
+                    {carouselPosts.map((_, index) => (
+                      <button 
+                        class="carousel-indicator w-3 h-3 rounded-full bg-white/50 hover:bg-white transition-colors"
+                        data-index={index}
+                      ></button>
+                    ))}
+                  </div>
+                  
+                  <!-- Carousel Arrows -->
+                  <button id="carousel-prev" class="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 hover:bg-black/50 text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                  </button>
+                  <button id="carousel-next" class="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 hover:bg-black/50 text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                  </button>
+                </>
+              ) : (
+                <div class="flex items-center justify-center h-full">
+                  <p class="text-gray-500">暂无封面图片</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <!-- Right Side: Announcement + Featured (1/3 width) -->
+        <div class="lg:col-span-1 flex flex-col gap-4" style="height: 360px;">
+          <!-- 最新公告 -->
+          <div class="bg-white rounded-xl shadow-sm p-4 flex-shrink-0">
+            <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2 mb-2">
+              <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path>
+              </svg>
+              最新公告
+            </h3>
+            {activeAnnouncements.length > 0 ? (
+              <div class="space-y-2">
+                {activeAnnouncements.slice(0, 2).map((announcement: any) => (
+                  <div class="flex items-start gap-2 text-sm text-gray-600">
+                    <span class="text-amber-400 mt-0.5 flex-shrink-0">●</span>
+                    <p class="line-clamp-2">{announcement.content}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p class="text-sm text-gray-400">暂无公告</p>
+            )}
+          </div>
+
+          <!-- 特别推荐 (only 1 post) -->
+          <div class="flex-1 min-h-0">
+            <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2 mb-2">
+              <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+              </svg>
+              特别推荐
+            </h3>
+            {featuredPost ? (
+              <a 
+                href={`/posts/${featuredPost.slug}`}
+                class="block bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-shadow group relative h-[calc(100%-28px)]"
+              >
+                {featuredPost.data.coverImage ? (
+                  <div class="absolute inset-0">
+                    <img 
+                      src={featuredPost.data.coverImage} 
+                      alt={featuredPost.data.title}
+                      class="w-full h-full object-cover"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10"></div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4">
+                      <div class="backdrop-blur-md bg-black/30 rounded-lg p-3 border border-white/10">
+                        <h4 class="font-bold text-white text-base line-clamp-2 drop-shadow-lg">
+                          {featuredPost.data.title}
+                        </h4>
+                        {featuredPost.data.excerpt && (
+                          <p class="text-gray-200 text-xs line-clamp-2 mt-1 drop-shadow">{featuredPost.data.excerpt}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
+                    <div class="text-center p-4">
+                      <span class="text-4xl font-bold text-blue-300">★</span>
+                      <h4 class="font-bold text-gray-700 text-base mt-2 line-clamp-2">
+                        {featuredPost.data.title}
+                      </h4>
+                    </div>
+                  </div>
+                )}
+              </a>
+            ) : (
+              <div class="bg-white rounded-xl shadow-sm flex items-center justify-center h-[calc(100%-28px)]">
+                <p class="text-gray-400 text-sm">暂无推荐</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      <!-- Latest Posts Section -->
+      <div class="bg-white rounded-xl shadow-sm p-6">
+        <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+          </svg>
+          最新文章
+        </h3>
+        
+        {latestPosts.length === 0 ? (
+          <p class="text-gray-500 text-center py-8">暂无文章</p>
+        ) : (
+          <div class="space-y-4">
+            {latestPosts.map(post => (
+              <article class="flex gap-4 border border-gray-100 rounded-lg p-4 hover:border-indigo-200 hover:shadow-sm transition-all">
+                {post.data.coverImage && (
+                  <a href={`/posts/${post.slug}`} class="flex-shrink-0">
+                    <img 
+                      src={post.data.coverImage} 
+                      alt={post.data.title}
+                      class="w-48 h-28 object-cover rounded-lg hover:opacity-90 transition-opacity"
+                    />
+                  </a>
+                )}
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <time datetime={post.data.date}>{post.data.date}</time>
+                    <span>•</span>
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    <span class="post-views" data-slug={post.slug} data-baseline={String(viewsData[post.slug] || 0)}>{viewsData[post.slug] || 0}</span> 阅读
+                    <span>•</span>
+                    <span>{post.data.author}</span>
+                  </div>
+                  <h4 class="text-lg font-bold text-gray-900 mb-2 hover:text-indigo-600 transition-colors">
+                    <a href={`/posts/${post.slug}`}>{post.data.title}</a>
+                  </h4>
+                  <p class="text-sm text-gray-600 line-clamp-2">{post.data.excerpt}</p>
+                  <div class="flex flex-wrap gap-1 mt-3">
+                    {post.data.tags.slice(0, 3).map(tag => (
+                      <a 
+                        href={`/tags/${tag}`}
+                        class="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full hover:bg-gray-200 transition-colors"
+                      >
+                        #{tag}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+    
+    <!-- Sidebar (Right Column) -->
+    <aside class="lg:w-64 flex-shrink-0">
+      <Sidebar />
+    </aside>
+  </div>
+</BaseLayout>
+
+<script>
+  const slides = document.querySelectorAll('.carousel-slide');
+  const indicators = document.querySelectorAll('.carousel-indicator');
+  const prevBtn = document.getElementById('carousel-prev');
+  const nextBtn = document.getElementById('carousel-next');
+  
+  if (slides.length > 0) {
+    let currentIndex = 0;
+    const totalSlides = slides.length;
+    
+    function showSlide(index: number) {
+      slides.forEach((slide, i) => {
+        (slide as HTMLElement).style.opacity = i === index ? '1' : '0';
+        (slide as HTMLElement).style.zIndex = i === index ? '1' : '0';
+      });
+      indicators.forEach((indicator, i) => {
+        indicator.classList.toggle('bg-white', i === index);
+        indicator.classList.toggle('bg-white/50', i !== index);
+      });
+      currentIndex = index;
+    }
+    
+    function nextSlide() {
+      showSlide((currentIndex + 1) % totalSlides);
+    }
+    
+    function prevSlide() {
+      showSlide((currentIndex - 1 + totalSlides) % totalSlides);
+    }
+    
+    indicators.forEach((indicator, index) => {
+      indicator.addEventListener('click', () => showSlide(index));
+    });
+    
+    prevBtn?.addEventListener('click', prevSlide);
+    nextBtn?.addEventListener('click', nextSlide);
+    
+    setInterval(nextSlide, 5000);
+  }
+</script>
+
+<script is:inline>
+(function(){
+  var VIEWS_KEY='xiaohe_post_views';
+  var stored={};
+  try{stored=JSON.parse(localStorage.getItem(VIEWS_KEY)||'{}')}catch(e){}
+  document.querySelectorAll('.post-views').forEach(function(el){
+    var slug=el.getAttribute('data-slug');
+    var baseline=parseInt(el.getAttribute('data-baseline')||'0');
+    var inc=parseInt(stored[slug]||'0');
+    el.textContent=baseline+inc;
+  });
+})();
+</script>

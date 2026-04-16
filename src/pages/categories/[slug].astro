@@ -1,0 +1,75 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Sidebar from '../../components/Sidebar.astro';
+import { getCategories } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const categories = await getCategories();
+  const allPosts = await getCollection('posts');
+  
+  return categories.map((category: any) => {
+    const catSlug = category.slug || category.id;
+    const catPosts = allPosts.filter(post => post.data.category === catSlug);
+    return {
+      params: { slug: catSlug },
+      props: { category, posts: catPosts },
+    };
+  });
+}
+
+const { category, posts } = Astro.props;
+---
+
+<BaseLayout title={`分类: ${category?.name || Astro.params.slug}`} description={category?.description || ''}>
+  <div class="flex flex-col lg:flex-row gap-8">
+    <div class="flex-1 min-w-0">
+      <div class="space-y-6">
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <h1 class="text-3xl font-bold mb-2">分类: {category?.name}</h1>
+          {category?.description && (
+            <p class="text-gray-600">{category.description}</p>
+          )}
+        </div>
+
+        <div class="space-y-6">
+          {posts.length === 0 ? (
+            <div class="text-center py-16 bg-white rounded-xl shadow-sm">
+              <p class="text-gray-500">该分类下暂无文章</p>
+            </div>
+          ) : (
+            posts.map(post => (
+              <article class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center text-sm text-gray-500 mb-3">
+                  <time dateTime={post.data.date}>{post.data.date}</time>
+                  <span class="mx-2">•</span>
+                  <span>{post.data.author}</span>
+                </div>
+                
+                <h2 class="text-2xl font-bold mb-3">
+                  <a href={`/posts/${post.slug}`} class="text-gray-900 hover:text-indigo-600 transition-colors">
+                    {post.data.title}
+                  </a>
+                </h2>
+                
+                <p class="text-gray-600 mb-4">{post.data.excerpt}</p>
+                
+                <div class="flex flex-wrap gap-2">
+                  {post.data.tags.map((tag: string) => (
+                    <a href={`/tags/${tag}`} class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors">
+                      #{tag}
+                    </a>
+                  ))}
+                </div>
+              </article>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+
+    <aside class="lg:w-72 flex-shrink-0">
+      <Sidebar />
+    </aside>
+  </div>
+</BaseLayout>

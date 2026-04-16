@@ -1,0 +1,32 @@
+[
+  {
+    "id": "astro",
+    "name": "Astro框架",
+    "slug": "astro"
+  },
+  {
+    "id": "javascript",
+    "name": "JavaScript",
+    "slug": "javascript"
+  },
+  {
+    "id": "webdev",
+    "name": "Web开发",
+    "slug": "webdev"
+  },
+  {
+    "id": "tutorial",
+    "name": "教程",
+    "slug": "tutorial"
+  },
+  {
+    "id": "tailwind",
+    "name": "Tailwind",
+    "slug": "tailwind"
+  },
+  {
+    "id": "life",
+    "name": "生活",
+    "slug": "life"
+  }
+]

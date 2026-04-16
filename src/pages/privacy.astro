@@ -1,0 +1,75 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="隐私政策" description="XiaoHe 博客隐私政策">
+  <div class="bg-white rounded-xl shadow-sm p-8 max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-900 mb-6">隐私政策</h1>
+    <p class="text-gray-500 mb-8">最后更新日期：2026年4月16日</p>
+
+    <div class="prose prose-lg max-w-none text-gray-700">
+      <h2 class="text-xl font-bold text-gray-900 mt-6 mb-3">1. 信息收集</h2>
+      <p class="mb-4">我们可能收集以下类型的信息：</p>
+      <ul class="list-disc pl-6 mb-4 space-y-2">
+        <li><strong>访问数据</strong>：当您访问我们的网站时，我们可能会自动收集某些信息，包括您的 IP 地址、浏览器类型、操作系统、访问时间和页面浏览记录。</li>
+        <li><strong>评论信息</strong>：当您在博客上发表评论时，我们会收集您提供的昵称、评论内容以及评论时间。</li>
+        <li><strong>本地存储</strong>：我们使用浏览器的 localStorage 和 sessionStorage 来记录访问统计数据，以提供更好的用户体验。</li>
+      </ul>
+
+      <h2 class="text-xl font-bold text-gray-900 mt-6 mb-3">2. 信息使用</h2>
+      <p class="mb-4">我们收集的信息将用于：</p>
+      <ul class="list-disc pl-6 mb-4 space-y-2">
+        <li>提供和维护我们的网站服务</li>
+        <li>改善用户体验和网站内容</li>
+        <li>统计网站访问量（使用去重机制确保数据真实性）</li>
+        <li>展示评论和互动内容</li>
+      </ul>
+
+      <h2 class="text-xl font-bold text-gray-900 mt-6 mb-3">3. 信息保护</h2>
+      <p class="mb-4">我们采取合理的技术措施来保护您的个人信息：</p>
+      <ul class="list-disc pl-6 mb-4 space-y-2">
+        <li>本网站通过 HTTPS 协议加密传输数据</li>
+        <li>评论内容以文件形式存储在安全的 GitHub 仓库中</li>
+        <li>我们不收集敏感个人信息（如密码、身份证号等）</li>
+        <li>访问统计数据仅存储在您的浏览器本地，不会上传至第三方服务器</li>
+      </ul>
+
+      <h2 class="text-xl font-bold text-gray-900 mt-6 mb-3">4. Cookie 和本地存储</h2>
+      <p class="mb-4">本网站使用浏览器的本地存储技术（localStorage 和 sessionStorage）来：</p>
+      <ul class="list-disc pl-6 mb-4 space-y-2">
+        <li>记录访问统计（去重后的访问次数）</li>
+        <li>记住您的会话状态</li>
+        <li>提供更好的用户体验</li>
+      </ul>
+      <p class="mb-4">您可以随时通过浏览器设置清除这些本地存储数据。</p>
+
+      <h2 class="text-xl font-bold text-gray-900 mt-6 mb-3">5. 第三方服务</h2>
+      <p class="mb-4">本网站可能包含指向第三方网站的链接。我们对这些第三方网站的隐私做法不承担责任。建议您在访问第三方网站时阅读其隐私政策。</p>
+
+      <h2 class="text-xl font-bold text-gray-900 mt-6 mb-3">6. 评论规则</h2>
+      <p class="mb-4">我们欢迎您在博客上发表评论，但请注意：</p>
+      <ul class="list-disc pl-6 mb-4 space-y-2">
+        <li>评论发布后即公开可见</li>
+        <li>评论者将被分配随机头像</li>
+        <li>其他用户可以对您的评论进行回复</li>
+        <li>我们保留删除不当评论的权利</li>
+      </ul>
+
+      <h2 class="text-xl font-bold text-gray-900 mt-6 mb-3">7. 数据保留</h2>
+      <p class="mb-4">我们会在合理期限内保留您的信息。如果您希望删除您的评论或其他数据，请通过以下方式联系我们。</p>
+
+      <h2 class="text-xl font-bold text-gray-900 mt-6 mb-3">8. 儿童隐私</h2>
+      <p class="mb-4">本网站不针对 13 岁以下的儿童。我们不会故意收集儿童的个人信息。</p>
+
+      <h2 class="text-xl font-bold text-gray-900 mt-6 mb-3">9. 政策变更</h2>
+      <p class="mb-4">我们可能会不时更新本隐私政策。更新后的政策将在本页面上发布，并修改"最后更新日期"。</p>
+
+      <h2 class="text-xl font-bold text-gray-900 mt-6 mb-3">10. 联系我们</h2>
+      <p class="mb-4">如果您对本隐私政策有任何疑问，请通过以下方式联系我们：</p>
+      <ul class="list-disc pl-6 mb-4 space-y-2">
+        <li>Telegram: <a href="https://t.me/xiaohe" target="_blank" class="text-blue-600 hover:underline">@xiaohe</a></li>
+        <li>GitHub: <a href="https://github.com/xiaohe" target="_blank" class="text-blue-600 hover:underline">github.com/xiaohe</a></li>
+      </ul>
+    </div>
+  </div>
+</BaseLayout>
